@@ -11,7 +11,7 @@ P_min = zeros(length(m_values), 1);
 P_max = zeros(length(m_values), 1);
 
 % Set the initial conditions for [M, E, P]
-initial_conditions = rand(1,3);
+initial_conditions = [1, 1, .1];
 
 % Loop through each Hill coefficient value
 for i = 1:length(m_values)
@@ -30,19 +30,20 @@ for i = 1:length(m_values)
     % Solve the ODE for the initial condition
     [t, y] = ode45(ode_func, t_span, initial_conditions');
     
-    % Store the minimum and maximum values of P
-    P_min(i) = min(y(:, 3));
-    P_max(i) = max(y(:, 3));
+    idx_stable = t > 0.8 * t_span(end); % Consider only the last 20% of the time points
+    P_min(i) = min(y(idx_stable, 3));
+    P_max(i) = max(y(idx_stable, 3));
+
 end
 
 % Create a bifurcation diagram
 figure;
 hold on;
-plot(m_values, P_min, 'o-', 'MarkerSize', 5, 'DisplayName', 'Min P');
-plot(m_values, P_max, 'o-', 'MarkerSize', 5, 'DisplayName', 'Max P');
-xlabel('Hill Coefficient (m)');
-ylabel('P (Min/Max)');
-title('Bifurcation Diagram of P vs m');
+plot(m_values, P_min, 'o-', 'LineWidth', 2, 'MarkerSize', 5, 'DisplayName', 'Min P');
+plot(m_values, P_max, 'o-', 'LineWidth', 2, 'MarkerSize', 5, 'DisplayName', 'Max P');
+xlabel('Hill Coefficient (m)', 'FontSize', 12);
+ylabel('P (Min/Max)', 'FontSize', 12);
+title('Bifurcation Diagram of P vs m', 'FontSize', 16);
 legend('show');
 grid on;
 hold off;
